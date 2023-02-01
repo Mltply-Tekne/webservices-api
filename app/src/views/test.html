@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+        var array = '[[16,2], [17,3]]'
+        
+        function buscar() {
+
+            console.log('Searching...')
+
+            drivers = [
+                {
+                    "age": "17",
+                    "points": "21"
+                },
+                {
+                    "age": "16",
+                    "points": "7"
+                }
+            ]
+
+            username = ''
+            password = ''
+
+            console.log(JSON.stringify(drivers))
+
+            $.ajax({
+                url: "https://stable-api.eastus.cloudapp.azure.com/api_dev/v1/driver/getDriversAvgFactor/",
+                data: {drivers: drivers},
+                type: "POST",
+                dataType: 'html',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", "Basic " + btoa(username + ":" + password));
+                },
+                success:function(result) {
+                    console.log(JSON.parse(result))
+                },
+                error: function (request, error) {
+                    console.log(arguments);
+                    alert(" Can't do because: " + error);
+                }
+            });
+        }
+        
+    </script>
+
+    <button onclick="buscar()">Search</button>
+</body>
+</html>
