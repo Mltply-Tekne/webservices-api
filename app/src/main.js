@@ -28,11 +28,9 @@ require('./config/network.js')(app, express);
 
 
 // Routes
-app.use('/', require('./routes/datasetDownloadRoutes'))
+app.use('/agency/verification/', require('./routes/agencyVerificationRoutes'))
+app.use('/resources/', require('./routes/resourcesRoutes'))
 
-app.use('/tu/', require('./routes/transunionRoutes'))
-
-app.use('/chargebee/', require('./routes/chargebeeRoutes'))
 
 app.get('/test/', function (request, response) {
   response.sendFile(`${process.env.srcPath}/views/test.html`)

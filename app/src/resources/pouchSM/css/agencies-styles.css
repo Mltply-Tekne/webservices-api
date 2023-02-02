@@ -1,0 +1,123 @@
+:root {
+    --lightGray: #F3F3F3;
+    --regularGray: #949494;
+    --darkGray: #575757;
+    --orange: #FF7327;
+    font-family: 'Segoe Pro', sans-serif;
+    font-size: 16px;
+  }
+
+  @import url('https://fonts.cdnfonts.com/css/segoe-pro');
+
+  body {
+    background-color: var(--lightGray);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+  }
+
+  header {
+    padding: 1em 4em;
+    background-color: #fff;
+  }
+
+  header img {
+    height: 3em;
+    width: auto;
+  }
+
+  h1 {
+    color: var(--regularGray);
+    text-align: center;
+    font-weight: 500;
+    padding: 2em 1em 1em 1em;
+  }
+
+  .header_btn {
+    color: var(--regularGray);
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.5s;
+    cursor: default;
+  }
+
+  .header_btn:hover {
+    color: var(--darkGray);
+  }
+
+  section.main {
+    padding-bottom: 4em;
+  }
+
+  div.main-table_box {
+    background-color: #fff;
+    box-shadow: 2px 8px 16px rgba(0,0,0,0.25);
+    width: 90%;
+    margin: 0 auto;
+    padding: 2em;
+    transition: 0.5s;
+    border-radius: 5px;
+  }
+
+  table.main-table {
+    border-collapse: collapse;
+    width: 90%;
+    margin: 0 4%;
+    /* overflow-y: scroll; */
+  }
+
+  table.main-table th {
+    text-align: center;    
+  }
+
+  table.main-table td {
+    text-align: center;
+  }
+
+  table td label {
+    display: none;
+  }
+
+  input[type=checkbox] {
+    accent-color: var(--orange);
+  }
+
+  .btn-submit {
+    transform: scale(0);
+    background-color: var(--orange);
+    color: #fff;
+    font-size: 1em;
+    padding: 0.6em 2em;
+    border-radius: 24px;
+    border: none;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+    /* positioning */
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 2em;
+    transition: 0.5s;
+  }
+
+  .btn-disabled {
+    background-color: var(--regularGray);
+  }
+
+  .btn-active {
+    transform: scale(1);
+  }
+
+  .hidden {
+    opacity: 0;
+  }
+
+  .active {
+    color: var(--orange)
+  }
+  
+
+
+
