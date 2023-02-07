@@ -1,123 +1,139 @@
 :root {
-    --lightGray: #F3F3F3;
-    --regularGray: #949494;
-    --darkGray: #575757;
-    --orange: #FF7327;
-    font-family: 'Segoe Pro', sans-serif;
-    font-size: 16px;
-  }
+  --lightGray: #F3F3F3;
+  --regularGray: #949494;
+  --darkGray: #575757;
+  --orange: #FF7327;
+  --lightOrange: #faa06f;
+  --bs-dropdown-link-active-bg: #FF7327 !important;
+  font-family: 'Segoe Pro', sans-serif;
+  font-size: 15px;
+}
 
-  @import url('https://fonts.cdnfonts.com/css/segoe-pro');
 
-  body {
-    background-color: var(--lightGray);
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-  }
+@import url('https://fonts.cdnfonts.com/css/segoe-pro');
 
-  header {
-    padding: 1em 4em;
-    background-color: #fff;
-  }
+body {
+  background-color: var(--lightGray);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+}
 
-  header img {
-    height: 3em;
-    width: auto;
-  }
+header {
+  padding: 1em 4em;
+  background-color: #fff;
+}
 
-  h1 {
-    color: var(--regularGray);
-    text-align: center;
-    font-weight: 500;
-    padding: 2em 1em 1em 1em;
-  }
+header img {
+  height: 3em;
+  width: auto;
+}
 
-  .header_btn {
-    color: var(--regularGray);
-    text-align: center;
-    font-size: 20px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.5s;
-    cursor: default;
-  }
+h1 {
+  color: var(--regularGray);
+  text-align: center;
+  font-weight: 500;
+  padding: 1em 1em 1em 1em;
+}
 
-  .header_btn:hover {
-    color: var(--darkGray);
-  }
+.header_btn {
+  color: var(--regularGray);
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.5s;
+  cursor: default;
+}
 
-  section.main {
-    padding-bottom: 4em;
-  }
+.header_btn:hover {
+  color: var(--darkGray);
+}
 
-  div.main-table_box {
-    background-color: #fff;
-    box-shadow: 2px 8px 16px rgba(0,0,0,0.25);
-    width: 90%;
-    margin: 0 auto;
-    padding: 2em;
-    transition: 0.5s;
-    border-radius: 5px;
-  }
+section.main {
+  padding-bottom: 4em;
+}
 
-  table.main-table {
-    border-collapse: collapse;
-    width: 90%;
-    margin: 0 4%;
-    /* overflow-y: scroll; */
-  }
+div.main-table_box {
+  background-color: #fff;
+  box-shadow: 2px 8px 16px rgba(0,0,0,0.25);
+  width: 90%;
+  margin: 0 auto;
+  padding: 2em;
+  transition: 0.5s;
+  border-radius: 10px;
+}
 
-  table.main-table th {
-    text-align: center;    
-  }
+table.main-table {
+  border-collapse: collapse;
+  width: 90%;
+  margin: 0 5%;
+  /* overflow-y: scroll; */
+}
 
-  table.main-table td {
-    text-align: center;
-  }
+table.main-table th {
+  text-align: left;    
+}
 
-  table td label {
-    display: none;
-  }
+table.main-table td {
+  text-align: left;
+}
 
-  input[type=checkbox] {
-    accent-color: var(--orange);
-  }
+table.main-table td > button {
+  border: 0px solid gray;
+  background-color: rgba(0,0,0,0.0);
+  border-radius: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  transition: 0.5s;
+}
 
-  .btn-submit {
-    transform: scale(0);
-    background-color: var(--orange);
-    color: #fff;
-    font-size: 1em;
-    padding: 0.6em 2em;
-    border-radius: 24px;
-    border: none;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.25);
-    /* positioning */
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    margin: 2em;
-    transition: 0.5s;
-  }
+table.main-table td > button:hover {
+  color: var(--orange);
+}
 
-  .btn-disabled {
-    background-color: var(--regularGray);
-  }
+table td label {
+  display: none;
+}
 
-  .btn-active {
-    transform: scale(1);
-  }
+input[type=checkbox] {
+  accent-color: var(--orange);
+}
 
-  .hidden {
-    opacity: 0;
-  }
+.btn-submit {
+  transform: scale(0);
+  background-color: var(--orange);
+  color: #fff;
+  font-size: 1em;
+  padding: 0.6em 2em;
+  border-radius: 24px;
+  border: none;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+  /* positioning */
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 2em;
+  transition: 0.5s;
+}
 
-  .active {
-    color: var(--orange)
-  }
-  
+.btn-disabled {
+  background-color: var(--regularGray);
+}
+
+.btn-active {
+  transform: scale(1);
+}
+
+.hidden {
+  opacity: 0;
+}
+
+.active-header {
+  color: var(--orange)
+}
+
 
 
 

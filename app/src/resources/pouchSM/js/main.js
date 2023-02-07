@@ -4,8 +4,11 @@ var pendingToReviewAgents;
 window.addEventListener("load", async function (event) {
 
     // Obtaining data
-    pendingToReviewAgents = await getFromServer('getAgentsToManage', stateToCheck)
-    pendingToReviewAgents = pendingToReviewAgents.response
+    apiData = await getFromServer('getAgentsToManage?reviewStatus=', stateToCheck)
+    apiData = apiData.response
+    pendingToReviewAgents = apiData.submissions
+    
+    console.log(pendingToReviewAgents)
 
     await poblateTables()
 });
@@ -20,14 +23,16 @@ let mObj = [{
 }]
 
 selectedFieldsAndNames = {
-    'submissionId': 'Submission ID', 
-    'nameOfAgency': 'Name of Agency', 
-    'streetAddress': 'Street Address', 
-    'city': 'City', 
-    'zip': 'Zip Code', 
-    'agencyEmailAddress': 'Agency Email Address',
-    'reviewStatus': 'Documentation Verified'
+    // 'submissionId': 'Submission ID', 
+    'nameOfAgency': 'Agency Name', 
+    'state': 'State', 
+    'enabledStates': 'Enabled States', 
+    'parentAgencyName': 'Parent Agency', 
+    'reviewStatus': 'checkbox',
+    'edit': 'Edit'
 }
+
+nonEditableFields = ['edit', 'reviewStatus']
 
 async function poblateTables() {
 
@@ -47,7 +52,29 @@ async function poblateTables() {
         
         let th = document.createElement('th')
         th.setAttribute('scope', 'col')
-        th.innerHTML = field
+
+        if (field == 'checkbox') {
+
+            th.setAttribute('style', 'text-align: center;')
+            
+            if (stateToCheck == 1) {
+                th.innerHTML = `Approve`
+            } else {
+                th.innerHTML = `Verify`
+            }
+
+        } else if (field == 'Edit') {
+
+            th.setAttribute('style', 'text-align: center;')
+            th.innerHTML = field
+
+        } else {
+
+            th.innerHTML = field
+
+        }
+
+        
         tr.append(th)
 
     }
@@ -76,12 +103,14 @@ async function poblateTables() {
 
         for (key of Object.keys(selectedFieldsAndNames)) {
 
-            let td = document.createElement('td')
-            td.setAttribute('style', 'max-width: 120px; line-break: anywhere;')
-            tr.append(td)
+            
 
             // If the key corresponds to the status, then we should make the checkbox
             if (key == 'reviewStatus') {
+
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis; text-align: center;')
+                tr.append(td)
 
                 let label = document.createElement('label')
                 label.setAttribute('for', 'approved-check')
@@ -114,7 +143,37 @@ async function poblateTables() {
                     
                 })
 
+            } else if (key == 'nameOfAgency') {
+
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 400px; width: 400px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
+                tr.append(td)
+                
+                td.innerHTML = pendingToReviewAgent[key]
+
+            } else if (key == 'edit') {
+
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;')
+                tr.append(td)
+
+                let button = document.createElement('button')
+                button.setAttribute('type', 'checkbox')
+                button.setAttribute('class', 'approvalRequired')
+                button.setAttribute('name', 'approvalRequired')
+                button.setAttribute('onclick', `editAgency(${pendingToReviewAgent['submissionId']})`)
+                button.setAttribute('submissionId', pendingToReviewAgent['submissionId'])
+                button.setAttribute('id', `checkbox_agency_${pendingToReviewAgent['submissionId']}`)
+                button.innerHTML = '<i class="fal fa-pencil"></i>'
+                td.append(button)
+
             } else {
+
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
+                tr.append(td)
                 
                 td.innerHTML = pendingToReviewAgent[key]
 
@@ -123,15 +182,14 @@ async function poblateTables() {
     
         }
 
-        mainBox = document.getElementById('main-table_box')
-        mainBox.classList.remove('hidden')
-
-
     }
-    
+
+    mainBox = document.getElementById('main-table_box')
+    mainBox.classList.remove('hidden')
 
 
 }
+
 
 approvalButton.addEventListener('click', async function() {
 
@@ -151,6 +209,10 @@ approvalButton.addEventListener('click', async function() {
 
     bodyObj = {
         reviewedAgents: agentsArr
+    }
+
+    if (stateToCheck == 1) {
+        postToAPI('', bodyObj)
     }
 
     await postToServer('updateAgentsToManage', bodyObj)

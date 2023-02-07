@@ -8,9 +8,19 @@ renderAgencyVerification = async function (request, response) {
     
 
     if (request.params.mode == 'approve') {
-        response.sendFile(`${process.env.srcPath}/resources/pouchSM/views/agencies-to-approve.html`);
+
+        let html = fs.readFileSync(`${process.env.srcPath}/resources/pouchSM/views/agencies-to-approve.html`, 'utf-8');
+        html = html.replaceAll('{server-environment}', process.env.environment)
+        response.send(html);
+
     } else if (request.params.mode == 'verify') {
+
         response.sendFile(`${process.env.srcPath}/resources/pouchSM/views/agencies-to-verify.html`);
+
+        let html = fs.readFileSync(`${process.env.srcPath}/resources/pouchSM/views/agencies-to-verify.html`, 'utf-8');
+        html = html.replaceAll('{server-environment}', process.env.environment)
+        response.send(html);
+
     } else{
         response.json('Not found!')
     }
