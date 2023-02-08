@@ -7,8 +7,6 @@ window.addEventListener("load", async function (event) {
     apiData = await getFromServer('getAgentsToManage?reviewStatus=', stateToCheck)
     apiData = apiData.response
     pendingToReviewAgents = apiData.submissions
-    
-    console.log(pendingToReviewAgents)
 
     await poblateTables()
 });
