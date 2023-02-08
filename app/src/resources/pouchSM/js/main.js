@@ -8,6 +8,8 @@ window.addEventListener("load", async function (event) {
     apiData = apiData.response
     pendingToReviewAgents = apiData.submissions
 
+    console.log(apiData)
+
     await poblateTables()
 });
 
@@ -20,14 +22,27 @@ let mObj = [{
     newStatus: 2
 }]
 
-selectedFieldsAndNames = {
+// If the status to check represent the review process or the status process
+selectedFieldsAndNames = stateToCheck < 2 ?
+{
     // 'submissionId': 'Submission ID', 
     'nameOfAgency': 'Agency Name', 
     'state': 'State', 
     'enabledStates': 'Enabled States', 
     'parentAgencyName': 'Parent Agency', 
-    'reviewStatus': 'checkbox',
-    'edit': 'Edit'
+    'edit': 'Edit',
+    'reviewStatus': 'checkbox'
+    
+} : {
+
+    // 'submissionId': 'Submission ID', 
+    'nameOfAgency': 'Agency Name', 
+    'state': 'State', 
+    'enabledStates': 'Enabled States', 
+    'parentAgencyName': 'Parent Agency',
+    'agentGroupId': 'Agent Group Id',
+    'currentStatus': 'Status'
+
 }
 
 nonEditableFields = ['edit', 'reviewStatus']
@@ -107,7 +122,7 @@ async function poblateTables() {
             if (key == 'reviewStatus') {
 
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis; text-align: center;')
+                td.setAttribute('style', 'max-width: 120px; width: 30px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis; text-align: center;')
                 tr.append(td)
 
                 let label = document.createElement('label')
@@ -153,7 +168,7 @@ async function poblateTables() {
             } else if (key == 'edit') {
 
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;')
+                td.setAttribute('style', 'max-width: 120px; width: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;')
                 tr.append(td)
 
                 let button = document.createElement('button')
@@ -165,6 +180,36 @@ async function poblateTables() {
                 button.setAttribute('id', `checkbox_agency_${pendingToReviewAgent['submissionId']}`)
                 button.innerHTML = '<i class="fal fa-pencil"></i>'
                 td.append(button)
+
+            } else if (key == 'currentStatus') {
+
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
+                tr.append(td)
+
+                detailedStatusDescriptions = {
+                    'verified': {
+                        name: 'Processing',
+                        icon: `<i style='color: #000dff; margin-right: 1%; animation:spin 4s linear infinite;' class="fas fa-sync"></i>`
+                    },
+                    'succesfully_added': {
+                        name: 'Succesfully Added',
+                        icon: `<i style='color: green; margin-right: 1%;' class="fad fa-check-circle"></i>`
+                    },
+                    'failed': {
+                        name: 'Failed to Add',
+                        icon: `<i style='color: #850000; margin-right: 1%;' class="fas fa-exclamation-circle"></i>`
+                    },
+                    'already_added': {
+                        name: 'Already Added',
+                        icon: `<i style='color: #cacf78; margin-left: 1%; margin-right: 3%;' class="fas fa-exclamation"></i>`
+                    }
+                }
+
+                detailedStatus = detailedStatusDescriptions[pendingToReviewAgent[key]]
+                
+                td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
 
             } else {
 

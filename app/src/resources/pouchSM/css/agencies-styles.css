@@ -9,6 +9,13 @@
   font-size: 15px;
 }
 
+@keyframes spin { 
+  100% { 
+      -webkit-transform: rotate(360deg); 
+      transform:rotate(360deg); 
+  } 
+}
+
 
 @import url('https://fonts.cdnfonts.com/css/segoe-pro');
 
