@@ -1,4 +1,5 @@
-var baseUrl = `https://pouch.eastus.cloudapp.azure.com/${serverEnvironment}/api/v1/agent/`
+var baseUrl = serverEnvironment == 'production' ? `https://pouch.eastus.cloudapp.azure.com/api/v1/agent/` : `https://pouch.eastus.cloudapp.azure.com/${serverEnvironment}/api/v1/agent/`
+
 
 async function getFromServer(pUrl, pStatus) {
 
