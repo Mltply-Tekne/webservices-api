@@ -30,6 +30,7 @@ selectedFieldsAndNames = stateToCheck < 2 ?
     'state': 'State', 
     'enabledStates': 'Enabled States', 
     'parentAgencyName': 'Parent Agency', 
+    'parentAgencyCommission': 'Commission',
     'edit': 'Edit',
     'reviewStatus': 'checkbox'
     
@@ -159,7 +160,7 @@ async function poblateTables() {
             } else if (key == 'nameOfAgency') {
 
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 400px; width: 400px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('style', 'max-width: 380px; width: 400px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
                 td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
                 tr.append(td)
                 

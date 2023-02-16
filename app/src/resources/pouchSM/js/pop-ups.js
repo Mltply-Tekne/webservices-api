@@ -73,6 +73,15 @@ function editAgency (pSubmissionId) {
 
                 }
 
+                // Changes the commission input based on the selection
+                select.addEventListener('change', function() {
+
+                    let agencyData = apiData.parentAgencyData.find(agency => agency['name'] == this.value)
+                    let inputCommission = document.getElementById('inputCommission')
+                    inputCommission.value = agencyData.commission
+
+                })
+
                 $('select').selectpicker();
 
             } else {
@@ -82,6 +91,14 @@ function editAgency (pSubmissionId) {
                 input.setAttribute("field", field)
                 input.setAttribute("placeholder", "Opcional")
                 input.setAttribute("style", "width: 90%;")
+
+                if (field == 'parentAgencyCommission') {
+                    input.setAttribute("type", "number")
+                    input.setAttribute("step", "0.01")
+                    input.setAttribute("id", 'inputCommission')
+                }
+                    
+
                 input.value = agentData[field]
                 inputContainer.append(input)
 

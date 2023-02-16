@@ -5,9 +5,6 @@ const fs = require('fs')
 // const promBundle = require("express-prom-bundle");
 const basicAuth = require('express-basic-auth')
 
-// Postgres
-var Pg = require(`${process.env.srcPath}/config/postgres.js`);
-
 
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: true })
@@ -73,10 +70,11 @@ module.exports = function( app, express ) {
 
   // Metrics endpoint
   app.get('/metrics', async (req, res) => {
-    pgTest = await Pg.execute_query('select 1=1')
+    
     metrics = await register.metrics()
     res.set('Content-Type', client.register.contentType)
     res.end(metrics)
+    
   })
 
   // app.use(metricsMiddleware)

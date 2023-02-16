@@ -25,6 +25,18 @@ renderAgencyVerification = async function (request, response) {
         html = html.replaceAll('{server-environment}', process.env.environment)
         response.send(html);
 
+    } else if (request.params.mode == 'login') {
+
+        let html = fs.readFileSync(`${process.env.srcPath}/resources/pouchSM/views/login.html`, 'utf-8');
+        html = html.replaceAll('{server-environment}', process.env.environment)
+        response.send(html);
+
+    } else if (request.params.mode == 'devRegister') {
+
+        let html = fs.readFileSync(`${process.env.srcPath}/resources/pouchSM/views/register.html`, 'utf-8');
+        html = html.replaceAll('{server-environment}', process.env.environment)
+        response.send(html);
+
     } else {
 
         response.json('Not found!')
