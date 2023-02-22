@@ -41,6 +41,7 @@ selectedFieldsAndNames = stateToCheck < 2 ?
     'state': 'State', 
     'enabledStates': 'Enabled States', 
     'parentAgencyName': 'Parent Agency',
+    'parentAgencyCommission': 'Commission',
     'agentGroupId': 'Agent Group Id',
     'currentStatus': 'Status'
 
@@ -162,6 +163,14 @@ async function poblateTables() {
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 380px; width: 400px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
                 td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
+                tr.append(td)
+                
+                td.innerHTML = pendingToReviewAgent[key]
+
+            } else if (key == 'parentAgencyName' && !(stateToCheck < 2)) {
+
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 300px; width: 300px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
                 tr.append(td)
                 
                 td.innerHTML = pendingToReviewAgent[key]
