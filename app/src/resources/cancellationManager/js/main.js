@@ -1,12 +1,13 @@
 var approvalButton = document.getElementById("btn-submit");
-var pendingToReviewAgents;
+var policiesToBeCanceledOrPaused;
 
 window.addEventListener("load", async function (event) {
 
     // Obtaining data
-    apiData = await getFromServer('getAgentsToManage?reviewStatus=', stateToCheck)
+    // apiData = await getFromServer('getAgentsToManage?reviewStatus=', stateToCheck)
+    apiData = await getFromServer('cancellations/')
     apiData = apiData.response
-    pendingToReviewAgents = apiData.submissions
+    policiesToBeCanceledOrPaused = apiData
 
     console.log(apiData)
 
@@ -23,30 +24,25 @@ let mObj = [{
 }]
 
 // If the status to check represent the review process or the status process
-selectedFieldsAndNames = stateToCheck < 2 ?
-{
-    // 'submissionId': 'Submission ID', 
-    'nameOfAgency': 'Agency Name', 
-    'state': 'State', 
-    'enabledStates': 'Enabled States', 
-    'parentAgencyName': 'Parent Agency', 
-    'parentAgencyCommission': 'Commission',
-    'edit': 'Edit',
-    'reviewStatus': 'checkbox'
-    
-} : {
+selectedFieldsAndNames = {
 
-    // 'submissionId': 'Submission ID', 
-    'nameOfAgency': 'Agency Name', 
-    'state': 'State', 
-    'enabledStates': 'Enabled States', 
-    'parentAgencyName': 'Parent Agency',
-    'agentGroupId': 'Agent Group Id',
-    'currentStatus': 'Status'
+    // "invoicenumber": 2926,
+    // "policynumber": "GACA_6YWV890000",
+    // "subscriptionid": "AzZRCxTQ1Y8B89Afb",
+    // "cancelstatus": "scheduled",
+    // "cancelreason": "#txn_16CJxCTW5u3jCI1Qh Payment of $158.52 via card ending 0100 failed due to the reason \"This transaction has been declined\" on Feb 17, 2023 05:02",
+    // "errortext": null,
+    // "quoteref": null,
+    // "createdon": "2023-02-17T11:50:06.031Z"
 
+    'policynumber': 'Policy Number',
+    // 'invoicenumber': 'Invoice Number',
+    'cancelstatus': 'Cancel Status', 
+    'errortext': 'Error Text',
+    'pause': 'Pause'
 }
 
-nonEditableFields = ['edit', 'reviewStatus']
+nonEditableFields = ['pause', 'reviewStatus']
 
 async function poblateTables() {
 
@@ -67,17 +63,7 @@ async function poblateTables() {
         let th = document.createElement('th')
         th.setAttribute('scope', 'col')
 
-        if (field == 'checkbox') {
-
-            th.setAttribute('style', 'text-align: center;')
-            
-            if (stateToCheck == 1) {
-                th.innerHTML = `Approve`
-            } else {
-                th.innerHTML = `Verify`
-            }
-
-        } else if (field == 'Edit') {
+        if (field == 'Pause') {
 
             th.setAttribute('style', 'text-align: center;')
             th.innerHTML = field
@@ -97,10 +83,10 @@ async function poblateTables() {
     table.append(tbody)
 
     // Iterating contents
-    for (pendingToReviewAgent of pendingToReviewAgents) {
+    for (policy of policiesToBeCanceledOrPaused) {
 
         let tr = document.createElement('tr')
-        tr.setAttribute('submissionId', pendingToReviewAgent['submissionId'])
+        tr.setAttribute('submissionId', policy['submissionId'])
 
         // tr.addEventListener('click', function () {
         //     let submissionId = this.getAttribute('submissionId')
@@ -134,8 +120,8 @@ async function poblateTables() {
                 input.setAttribute('type', 'checkbox')
                 input.setAttribute('class', 'approvalRequired')
                 input.setAttribute('name', 'approvalRequired')
-                input.setAttribute('submissionId', pendingToReviewAgent['submissionId'])
-                input.setAttribute('id', `checkbox_agency_${pendingToReviewAgent['submissionId']}`)
+                input.setAttribute('submissionId', policy['submissionId'])
+                input.setAttribute('id', `checkbox_agency_${policy['submissionId']}`)
                 td.append(input)
 
                 input.addEventListener('change', function() {
@@ -161,12 +147,12 @@ async function poblateTables() {
 
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 380px; width: 400px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
-                td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
+                td.setAttribute('id', `td_${key}_${policy['submissionId']}`)
                 tr.append(td)
                 
-                td.innerHTML = pendingToReviewAgent[key]
+                td.innerHTML = policy[key]
 
-            } else if (key == 'edit') {
+            } else if (key == 'pause') {
 
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 120px; width: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;')
@@ -176,17 +162,17 @@ async function poblateTables() {
                 button.setAttribute('type', 'checkbox')
                 button.setAttribute('class', 'approvalRequired')
                 button.setAttribute('name', 'approvalRequired')
-                button.setAttribute('onclick', `editAgency(${pendingToReviewAgent['submissionId']})`)
-                button.setAttribute('submissionId', pendingToReviewAgent['submissionId'])
-                button.setAttribute('id', `checkbox_agency_${pendingToReviewAgent['submissionId']}`)
-                button.innerHTML = '<i class="fal fa-pencil"></i>'
+                button.setAttribute('onclick', `editAgency(${policy['submissionId']})`)
+                button.setAttribute('submissionId', policy['submissionId'])
+                button.setAttribute('id', `checkbox_agency_${policy['submissionId']}`)
+                button.innerHTML = '<i class="fa fa-pause"></i>' //<i class="fa fa-play" aria-hidden="true"></i>
                 td.append(button)
 
             } else if (key == 'currentStatus') {
 
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
-                td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
+                td.setAttribute('id', `td_${key}_${policy['submissionId']}`)
                 tr.append(td)
 
                 detailedStatusDescriptions = {
@@ -208,36 +194,18 @@ async function poblateTables() {
                     }
                 }
 
-                detailedStatus = detailedStatusDescriptions[pendingToReviewAgent[key]]
+                detailedStatus = detailedStatusDescriptions[policy[key]]
                 
                 td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
-
-            } else if (key == 'agentGroupId') {
-
-                let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
-                td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
-                tr.append(td)
-
-                let a = document.createElement('a')
-                a.setAttribute('href', 'https://design.instanda.us/Agent/EditAgentGroup?agentGroupId=' + pendingToReviewAgent[key])
-                a.setAttribute('target', '_blank')
-                // a.setAttribute('style', 'color: var(--darkGray)')
-                a.innerHTML = pendingToReviewAgent[key]
-
-                td.append(a)
-
-                
-                
 
             } else {
 
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
-                td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
+                td.setAttribute('id', `td_${key}_${policy['submissionId']}`)
                 tr.append(td)
                 
-                td.innerHTML = pendingToReviewAgent[key]
+                td.innerHTML = policy[key]
 
             }
             
@@ -253,32 +221,32 @@ async function poblateTables() {
 }
 
 
-approvalButton.addEventListener('click', async function() {
+// approvalButton.addEventListener('click', async function() {
 
-    let checkedInputs = document.querySelectorAll('input[type=checkbox]:checked')
-    approvalButton.classList.add('btn-disabled')
-    approvalButton.setAttribute('disabled', '')
+//     let checkedInputs = document.querySelectorAll('input[type=checkbox]:checked')
+//     approvalButton.classList.add('btn-disabled')
+//     approvalButton.setAttribute('disabled', '')
 
-    agentsArr = []
+//     agentsArr = []
 
-    checkedInputs.forEach((input) => {
+//     checkedInputs.forEach((input) => {
 
-        let agent = pendingToReviewAgents.find(agent => agent['submissionId'] == input.getAttribute('submissionId'))
-        agent['newStatus'] = stateToCheck + 1
-        agentsArr.push(agent)
+//         let agent = pendingToReviewAgents.find(agent => agent['submissionId'] == input.getAttribute('submissionId'))
+//         agent['newStatus'] = stateToCheck + 1
+//         agentsArr.push(agent)
         
-    });
+//     });
 
-    bodyObj = {
-        reviewedAgents: agentsArr
-    }
+//     bodyObj = {
+//         reviewedAgents: agentsArr
+//     }
 
-    if (stateToCheck == 1) {
-        postToAPI('', bodyObj)
-    }
+//     if (stateToCheck == 1) {
+//         postToAPI('', bodyObj)
+//     }
 
-    await postToServer('updateAgentsToManage', bodyObj)
-    location.reload()
+//     await postToServer('updateAgentsToManage', bodyObj)
+//     location.reload()
 
 
-})
+// })

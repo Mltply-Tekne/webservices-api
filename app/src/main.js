@@ -28,6 +28,7 @@ require('./config/network.js')(app, express);
 
 
 // Routes
+app.use('/cancellations/', require('./routes/cancellationsRoutes'))
 app.use('/agency/verification/', require('./routes/agencyVerificationRoutes'))
 app.use('/resources/', require('./routes/resourcesRoutes'))
 require("./routes/auth.routes")(app);
