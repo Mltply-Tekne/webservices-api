@@ -1,6 +1,13 @@
 var approvalButton = document.getElementById("btn-submit");
 var pendingToReviewAgents;
 
+var tbody = document.createElement('tbody')
+
+var shownResults = {
+    start: 0,
+    end: 20
+}
+
 window.addEventListener("load", async function (event) {
 
     // Obtaining data
@@ -12,6 +19,7 @@ window.addEventListener("load", async function (event) {
 
     await poblateTables()
 });
+
 
 let mObj = [{
     submissionId: 15,
@@ -49,71 +57,12 @@ selectedFieldsAndNames = stateToCheck < 2 ?
 
 nonEditableFields = ['edit', 'reviewStatus']
 
-async function poblateTables() {
-
-    let table = document.getElementById('main-table')
-
-    let thead = document.createElement('thead')
-    table.append(thead)
-
-    let tr = document.createElement('tr')
-    thead.append(tr)
-    
-    
-    
-
-    // Iterating fields
-    for (field of Object.values(selectedFieldsAndNames)) {
-        
-        let th = document.createElement('th')
-        th.setAttribute('scope', 'col')
-
-        if (field == 'checkbox') {
-
-            th.setAttribute('style', 'text-align: center;')
-            
-            if (stateToCheck == 1) {
-                th.innerHTML = `Approve`
-            } else {
-                th.innerHTML = `Verify`
-            }
-
-        } else if (field == 'Edit') {
-
-            th.setAttribute('style', 'text-align: center;')
-            th.innerHTML = field
-
-        } else {
-
-            th.innerHTML = field
-
-        }
-
-        
-        tr.append(th)
-
-    }
-
-    let tbody = document.createElement('tbody')
-    table.append(tbody)
-
+function addToTable(pPendingToReviewAgents) {
     // Iterating contents
-    for (pendingToReviewAgent of pendingToReviewAgents) {
+    for (pendingToReviewAgent of pPendingToReviewAgents) {
 
         let tr = document.createElement('tr')
         tr.setAttribute('submissionId', pendingToReviewAgent['submissionId'])
-
-        // tr.addEventListener('click', function () {
-        //     let submissionId = this.getAttribute('submissionId')
-        //     checkBox = document.getElementById(`checkbox_agency_${submissionId}`)
-
-        //     if (checkBox.checked == false) {
-        //         checkBox.checked = true
-        //     } else {
-        //         checkBox.checked = false
-        //     }
-        // })
-
         tbody.append(tr)
 
         for (key of Object.keys(selectedFieldsAndNames)) {
@@ -254,12 +203,65 @@ async function poblateTables() {
         }
 
     }
+}
+
+async function poblateTables() {
+
+    let table = document.getElementById('main-table')
+
+    let thead = document.createElement('thead')
+    table.append(thead)
+
+    let tr = document.createElement('tr')
+    thead.append(tr)
+    
+    
+    
+
+    // Iterating fields
+    for (field of Object.values(selectedFieldsAndNames)) {
+        
+        let th = document.createElement('th')
+        th.setAttribute('scope', 'col')
+
+        if (field == 'checkbox') {
+
+            th.setAttribute('style', 'text-align: center;')
+            
+            if (stateToCheck == 1) {
+                th.innerHTML = `Approve`
+            } else {
+                th.innerHTML = `Verify`
+            }
+
+        } else if (field == 'Edit') {
+
+            th.setAttribute('style', 'text-align: center;')
+            th.innerHTML = field
+
+        } else {
+
+            th.innerHTML = field
+
+        }
+
+        
+        tr.append(th)
+
+    }
+
+    
+    table.append(tbody)
+
+    addToTable(pendingToReviewAgents)
 
     mainBox = document.getElementById('main-table_box')
     mainBox.classList.remove('hidden')
 
 
 }
+
+
 
 
 approvalButton.addEventListener('click', async function() {

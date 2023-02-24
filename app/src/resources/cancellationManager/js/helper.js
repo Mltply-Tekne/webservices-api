@@ -23,23 +23,7 @@ async function postToServer(pUrl, pBody) {
         type: "POST",
         dataType: 'html',
         beforeSend: function (xhr) {
-            xhr.setRequestHeader ("Authorization", "Basic " + btoa('pouchagent' + ":" + 'TLEsCHAcYs'));
-        }
-    })
-
-    return JSON.parse(result)
-
-}
-
-async function postToAPI(pUrl, pBody) {
-
-    var result = await $.ajax({
-        url: `https://mltply.eastus.cloudapp.azure.com/microservices/${serverEnvironment}/automation/massiveInsert/`,
-        data: pBody,
-        type: "POST",
-        dataType: 'html',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader ("Authorization", "Basic " + btoa('pouchagent' + ":" + 'TLEsCHAcYs'));
+            xhr.setRequestHeader ("token", "lwo09tpDykEXLs1aL2UeYgKfC3Tmz4P3s4oEndo9");
         }
     })
 

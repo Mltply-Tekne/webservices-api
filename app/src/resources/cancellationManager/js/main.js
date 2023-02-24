@@ -4,8 +4,7 @@ var policiesToBeCanceledOrPaused;
 window.addEventListener("load", async function (event) {
 
     // Obtaining data
-    // apiData = await getFromServer('getAgentsToManage?reviewStatus=', stateToCheck)
-    apiData = await getFromServer('cancellations/')
+    apiData = await getFromServer('cancellations')
     apiData = apiData.response
     policiesToBeCanceledOrPaused = apiData
 
@@ -14,31 +13,13 @@ window.addEventListener("load", async function (event) {
     await poblateTables()
 });
 
-let mObj = [{
-    submissionId: 15,
-    newStatus: 2
-},
-{
-    submissionId: 11,
-    newStatus: 2
-}]
-
 // If the status to check represent the review process or the status process
 selectedFieldsAndNames = {
 
-    // "invoicenumber": 2926,
-    // "policynumber": "GACA_6YWV890000",
-    // "subscriptionid": "AzZRCxTQ1Y8B89Afb",
-    // "cancelstatus": "scheduled",
-    // "cancelreason": "#txn_16CJxCTW5u3jCI1Qh Payment of $158.52 via card ending 0100 failed due to the reason \"This transaction has been declined\" on Feb 17, 2023 05:02",
-    // "errortext": null,
-    // "quoteref": null,
-    // "createdon": "2023-02-17T11:50:06.031Z"
-
+    'invoicenumber': 'Invoice Number',
     'policynumber': 'Policy Number',
-    // 'invoicenumber': 'Invoice Number',
-    'cancelstatus': 'Cancel Status', 
     'errortext': 'Error Text',
+    'cancelstatus': 'Cancel Status',
     'pause': 'Pause'
 }
 
@@ -47,6 +28,7 @@ nonEditableFields = ['pause', 'reviewStatus']
 async function poblateTables() {
 
     let table = document.getElementById('main-table')
+    table.innerHTML = ''
 
     let thead = document.createElement('thead')
     table.append(thead)
@@ -74,7 +56,6 @@ async function poblateTables() {
 
         }
 
-        
         tr.append(th)
 
     }
@@ -86,68 +67,18 @@ async function poblateTables() {
     for (policy of policiesToBeCanceledOrPaused) {
 
         let tr = document.createElement('tr')
-        tr.setAttribute('submissionId', policy['submissionId'])
-
-        // tr.addEventListener('click', function () {
-        //     let submissionId = this.getAttribute('submissionId')
-        //     checkBox = document.getElementById(`checkbox_agency_${submissionId}`)
-
-        //     if (checkBox.checked == false) {
-        //         checkBox.checked = true
-        //     } else {
-        //         checkBox.checked = false
-        //     }
-        // })
+        tr.setAttribute('invoicenumber', policy['invoicenumber'])
 
         tbody.append(tr)
 
         for (key of Object.keys(selectedFieldsAndNames)) {
 
-            
-
             // If the key corresponds to the status, then we should make the checkbox
-            if (key == 'reviewStatus') {
-
-                let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; width: 30px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis; text-align: center;')
-                tr.append(td)
-
-                let label = document.createElement('label')
-                label.setAttribute('for', 'approved-check')
-                td.append(label)
-
-                let input = document.createElement('input')
-                input.setAttribute('type', 'checkbox')
-                input.setAttribute('class', 'approvalRequired')
-                input.setAttribute('name', 'approvalRequired')
-                input.setAttribute('submissionId', policy['submissionId'])
-                input.setAttribute('id', `checkbox_agency_${policy['submissionId']}`)
-                td.append(input)
-
-                input.addEventListener('change', function() {
-
-                    numberOfCheckedInputs = document.querySelectorAll('input[type=checkbox]:checked').length
-
-                    if (numberOfCheckedInputs == 0) {
-                        approvalButton.classList.remove('btn-active')
-                    } else {
-                        approvalButton.classList.add('btn-active')
-
-                        if (stateToCheck == 1) {
-                            approvalButton.value = `Approve ${numberOfCheckedInputs}`
-                        } else {
-                            approvalButton.value = `Verify ${numberOfCheckedInputs}`
-                        }
-                        
-                    }
-                    
-                })
-
-            } else if (key == 'nameOfAgency') {
+            if (key == 'errortext') {
 
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 380px; width: 400px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
-                td.setAttribute('id', `td_${key}_${policy['submissionId']}`)
+                td.setAttribute('id', `td_${key}_${policy['invoicenumber']}`)
                 tr.append(td)
                 
                 td.innerHTML = policy[key]
@@ -162,53 +93,29 @@ async function poblateTables() {
                 button.setAttribute('type', 'checkbox')
                 button.setAttribute('class', 'approvalRequired')
                 button.setAttribute('name', 'approvalRequired')
-                button.setAttribute('onclick', `editAgency(${policy['submissionId']})`)
-                button.setAttribute('submissionId', policy['submissionId'])
-                button.setAttribute('id', `checkbox_agency_${policy['submissionId']}`)
-                button.innerHTML = '<i class="fa fa-pause"></i>' //<i class="fa fa-play" aria-hidden="true"></i>
+                button.setAttribute('id', `checkbox_agency_${policy['invoicenumber']}`)
+
+                button.innerHTML = policy.cancelstatus == 'scheduled' ? '<i class="fa fa-pause"></i>' : '<i class="fa fa-play"></i>'
+                button.setAttribute('onclick', `changeCancelStatus('${policy['invoicenumber']}')`)
                 td.append(button)
 
-            } else if (key == 'currentStatus') {
-
+            } else if (key == 'cancelstatus') {
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
-                td.setAttribute('id', `td_${key}_${policy['submissionId']}`)
                 tr.append(td)
-
-                detailedStatusDescriptions = {
-                    'verified': {
-                        name: 'Processing',
-                        icon: `<i style='color: #000dff; margin-right: 1%; animation:spin 4s linear infinite;' class="fas fa-sync"></i>`
-                    },
-                    'succesfully_added': {
-                        name: 'Succesfully Added',
-                        icon: `<i style='color: green; margin-right: 1%;' class="fad fa-check-circle"></i>`
-                    },
-                    'failed': {
-                        name: 'Failed to Add',
-                        icon: `<i style='color: #850000; margin-right: 1%;' class="fas fa-exclamation-circle"></i>`
-                    },
-                    'already_added': {
-                        name: 'Already Added',
-                        icon: `<i style='color: #cacf78; margin-left: 1%; margin-right: 3%;' class="fas fa-exclamation"></i>`
-                    }
-                }
-
-                detailedStatus = detailedStatusDescriptions[policy[key]]
                 
-                td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
+                td.innerHTML = policy[key].toUpperCase()
 
             } else {
 
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
-                td.setAttribute('id', `td_${key}_${policy['submissionId']}`)
+                td.setAttribute('id', `td_${key}_${policy['invoicenumber']}`)
                 tr.append(td)
                 
                 td.innerHTML = policy[key]
 
             }
-            
     
         }
 
@@ -221,7 +128,7 @@ async function poblateTables() {
 }
 
 
-// approvalButton.addEventListener('click', async function() {
+// pauseAllPolicies.addEventListener('click', async function() {
 
 //     let checkedInputs = document.querySelectorAll('input[type=checkbox]:checked')
 //     approvalButton.classList.add('btn-disabled')
@@ -248,5 +155,9 @@ async function poblateTables() {
 //     await postToServer('updateAgentsToManage', bodyObj)
 //     location.reload()
 
+
+// })
+
+// resumeAllPolicies.addEventListener('click', async function() {
 
 // })
