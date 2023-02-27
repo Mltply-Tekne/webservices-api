@@ -5,8 +5,7 @@ window.addEventListener("load", async function (event) {
 
     // Obtaining data
     apiData = await getFromServer('cancellations')
-    apiData = apiData.response
-    policiesToBeCanceledOrPaused = apiData
+    policiesToBeCanceledOrPaused = apiData.response
 
     console.log(apiData)
 
@@ -18,12 +17,12 @@ selectedFieldsAndNames = {
 
     'invoicenumber': 'Invoice Number',
     'policynumber': 'Policy Number',
-    'errortext': 'Error Text',
-    'cancelstatus': 'Cancel Status',
-    'pause': 'Pause'
+    'subscriptionid': 'Subscription Id',
+    'cancelreason': 'Cancel Reason',
+    'status': 'Invoice Status',
+    'cancelstatus': 'Status',
+    'action': 'Action'
 }
-
-nonEditableFields = ['pause', 'reviewStatus']
 
 async function poblateTables() {
 
@@ -45,7 +44,7 @@ async function poblateTables() {
         let th = document.createElement('th')
         th.setAttribute('scope', 'col')
 
-        if (field == 'Pause') {
+        if (field == 'Action') {
 
             th.setAttribute('style', 'text-align: center;')
             th.innerHTML = field
@@ -74,43 +73,113 @@ async function poblateTables() {
         for (key of Object.keys(selectedFieldsAndNames)) {
 
             // If the key corresponds to the status, then we should make the checkbox
-            if (key == 'errortext') {
+            if (['invoicenumber', 'policynumber', 'subscriptionid'].includes(key)) {
 
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 380px; width: 400px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('style', 'max-width: 120px; width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
                 td.setAttribute('id', `td_${key}_${policy['invoicenumber']}`)
+                td.setAttribute('title', policy[key])
                 tr.append(td)
-                
-                td.innerHTML = policy[key]
 
-            } else if (key == 'pause') {
+                
+                urlObject = {
+                    'invoicenumber': {
+                        url: 'https://pouch.chargebee.com/d/invoices/'
+                    },
+                    'subscriptionid': {
+                        url: 'https://pouch.chargebee.com/d/subscriptions/'
+                    }
+                }
+
+                if (Object.keys(urlObject).includes(key)) {
+
+                    let a = document.createElement('a')
+                    a.setAttribute('href', urlObject[key].url + policy[key])
+                    a.setAttribute('target', '_blank')
+                    // a.setAttribute('style', 'color: var(--darkGray)')
+                    a.innerHTML = policy[key]
+
+                    td.append(a)
+                } else 
+                    td.innerHTML = policy[key]
+
+            } else if (key == 'action') {
 
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; width: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;')
+                td.setAttribute('style', 'max-width: 80px; width: 30px; white-space: nowrap; text-overflow: ellipsis; text-align: center;')
                 tr.append(td)
 
                 let button = document.createElement('button')
-                button.setAttribute('type', 'checkbox')
-                button.setAttribute('class', 'approvalRequired')
-                button.setAttribute('name', 'approvalRequired')
                 button.setAttribute('id', `checkbox_agency_${policy['invoicenumber']}`)
 
-                button.innerHTML = policy.cancelstatus == 'scheduled' ? '<i class="fa fa-pause"></i>' : '<i class="fa fa-play"></i>'
-                button.setAttribute('onclick', `changeCancelStatus('${policy['invoicenumber']}')`)
+                button.innerHTML = policy.cancelstatus == 'scheduled' ? '<i class="fas fa-pause-circle"></i>' : '<i class="fas fa-clock"></i>'
+                button.setAttribute('onclick', `changeCancelStatus('${policy['invoicenumber']}', '${policy.cancelstatus == 'scheduled' ? 'scheduled' : 'paused'}')`)
+                button.setAttribute('title', policy.cancelstatus == 'scheduled' ? 'Pause' : 'Resume')
                 td.append(button)
 
+                let buttonDelete = document.createElement('button')
+                buttonDelete.innerHTML = '<i class="fas fa-trash-alt"></i>'
+                buttonDelete.setAttribute('onclick', `changeCancelStatus('${policy['invoicenumber']}', 'deleted')`)
+                buttonDelete.setAttribute('title', 'Delete')
+                td.append(buttonDelete)
+
             } else if (key == 'cancelstatus') {
+                
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('style', 'max-width: 90px; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;')
+                tr.append(td)
+
+                detailedStatusDescriptions = {
+                    'scheduled': {
+                        name: 'Scheduled',
+                        icon: `<i style='color: #000dff; margin-right: 1%;' class="fas fa-clock"></i>`
+                    },
+                    'paused': {
+                        name: 'Paused',
+                        icon: `<i style='color: #E49B0F; margin-right: 1%;' class="fas fa-pause-circle"></i>`
+                    }
+                }
+
+                detailedStatus = detailedStatusDescriptions[policy[key]]
+                td.setAttribute('title', detailedStatus.name)
+                td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
+
+            } else if (key == 'status') {
+
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 90px; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;')
+                tr.append(td)
+
+                detailedStatusDescriptions = {
+                    'not_paid': {
+                        name: 'Not Paid',
+                        icon: `<i style='color: #FE1616; margin-right: 1%;' class="fas fa-times"></i>`
+                    },
+                    'other': {
+                        name: 'Not Applicable',
+                        icon: `<i style='color: #E49B0F; margin-right: 1%;' class="fas fa-times"></i>`
+                    }
+                }
+
+                detailedStatus = policy[key] === 'not_paid' ? detailedStatusDescriptions.not_paid : detailedStatusDescriptions.other
+                td.setAttribute('title', detailedStatus.name)
+                td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
+
+            } else if (key == 'cancelreason') {
+
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 400px; width: 400px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('title', policy[key])
                 tr.append(td)
                 
-                td.innerHTML = policy[key].toUpperCase()
+                td.innerHTML = policy[key]
 
             } else {
 
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
                 td.setAttribute('id', `td_${key}_${policy['invoicenumber']}`)
+                td.setAttribute('title', policy[key])
                 tr.append(td)
                 
                 td.innerHTML = policy[key]
@@ -129,31 +198,6 @@ async function poblateTables() {
 
 
 // pauseAllPolicies.addEventListener('click', async function() {
-
-//     let checkedInputs = document.querySelectorAll('input[type=checkbox]:checked')
-//     approvalButton.classList.add('btn-disabled')
-//     approvalButton.setAttribute('disabled', '')
-
-//     agentsArr = []
-
-//     checkedInputs.forEach((input) => {
-
-//         let agent = pendingToReviewAgents.find(agent => agent['submissionId'] == input.getAttribute('submissionId'))
-//         agent['newStatus'] = stateToCheck + 1
-//         agentsArr.push(agent)
-        
-//     });
-
-//     bodyObj = {
-//         reviewedAgents: agentsArr
-//     }
-
-//     if (stateToCheck == 1) {
-//         postToAPI('', bodyObj)
-//     }
-
-//     await postToServer('updateAgentsToManage', bodyObj)
-//     location.reload()
 
 
 // })

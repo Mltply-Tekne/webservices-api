@@ -9,6 +9,8 @@
   font-size: 15px;
 }
 
+a:link { text-decoration: none; }
+
 @keyframes spin { 
   100% { 
       -webkit-transform: rotate(360deg); 
@@ -80,7 +82,8 @@ table.main-table {
 }
 
 table.main-table th {
-  text-align: left;    
+  text-align: left;
+  white-space: pre;   
 }
 
 table.main-table td {

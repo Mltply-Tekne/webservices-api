@@ -1,12 +1,23 @@
-function changeCancelStatus(pInvoiceNumber) {
+function changeCancelStatus(pInvoiceNumber, pCancelStatus) {
     let policyIndex = policiesToBeCanceledOrPaused.findIndex(policy => policy['invoicenumber'] == pInvoiceNumber)
-    let policyData = policiesToBeCanceledOrPaused[policyIndex]
 
     let body = document.getElementById('standard_popup_body')
     body.innerHTML = ""
     body.setAttribute("style", "text-align: center")
 
-    document.getElementById('title_standard_popup').innerHTML = `<i style='margin-right: 1%;'></i> Are you sure to ${policyData.cancelstatus == 'scheduled' ? 'pause' : 'resume'} the policy automated cancellation?`
+    let textContainer = document.createElement('div')
+    textContainer.setAttribute('style', 'display: flex; justify-content: center; flex-direction: column;')
+    body.append(textContainer)
+
+    let icon = document.createElement('p')
+    icon.innerHTML = `<i style='font-size: 40px; color: var(--orange);' class="fas fa-question-circle"></i>`
+    textContainer.append(icon)
+
+
+    let p = document.createElement('p')
+    p.setAttribute('style', 'text-align: center; font-size: 20px;')
+    p.innerHTML = `<i style='margin-right: 1%;'></i> Are you sure to ${pCancelStatus == 'scheduled' ? 'pause' : pCancelStatus == 'paused' ? 'resume' : 'delete'} the policy automated cancellation?`
+    textContainer.append(p)
 
     let buttonContainer = document.createElement('div')
     buttonContainer.setAttribute('style', 'display: flex; justify-content: end;')
@@ -18,23 +29,22 @@ function changeCancelStatus(pInvoiceNumber) {
     button.innerHTML = "Cancel"
     buttonContainer.append(button)
 
-    var saveButton = document.createElement('button')
-    // button.setAttribute("style", "margin-top: 5%; margin-bottom: 1%; width: 50%;")
-    saveButton.classList.add('input_popup_warn')
-    saveButton.innerHTML = "Save"
-    buttonContainer.append(saveButton)
+    var confirmButton = document.createElement('button')
+    confirmButton.classList.add('input_popup_warn')
+    confirmButton.innerHTML = "Confirm"
+    buttonContainer.append(confirmButton)
 
-    // var r = document.querySelector('.dropdown-menu');
-    // r.style.setProperty('--bs-dropdown-link-active-bg', '#FF7327');
-    // r.setAttribute('style', '--bs-dropdown-link-active-bg')
-
-    saveButton.addEventListener('click', async function () {
+    confirmButton.addEventListener('click', async function () {
 
         closestandard_popup()
 
-        policiesToBeCanceledOrPaused[policyIndex].cancelstatus = policyData.cancelstatus == 'scheduled' ? 'pause' : 'scheduled'
+        policiesToBeCanceledOrPaused[policyIndex].cancelstatus = pCancelStatus == 'scheduled' ? 'paused' : 
+                                                                pCancelStatus == 'paused' ? 'scheduled' : 'deleted'
 
         await postToServer('cancellations', {reviewedCancellations: [policiesToBeCanceledOrPaused[policyIndex]]})
+
+        if (pCancelStatus == 'deleted') policiesToBeCanceledOrPaused.splice(policyIndex, 1)
+
         poblateTables()
     })
 
