@@ -242,6 +242,7 @@ async function confirmationPopup(pPrimaryText, pSecondaryText, pAction) {
     let body = document.getElementById('standard_popup_body')
     body.innerHTML = ""
     body.setAttribute("style", "text-align: center")
+    document.getElementById('title_standard_popup').innerHTML = ''
 
     let textContainer = document.createElement('div')
     textContainer.setAttribute('style', 'display: flex; justify-content: center; flex-direction: column;')
@@ -249,6 +250,7 @@ async function confirmationPopup(pPrimaryText, pSecondaryText, pAction) {
 
     let icon = document.createElement('p')
     icon.innerHTML = `<i style='font-size: 40px; color: var(--orange);' class="fas fa-question-circle"></i>`
+    icon.setAttribute('style', 'margin-bottom: 3%;')
     textContainer.append(icon)
 
     let p = document.createElement('p')

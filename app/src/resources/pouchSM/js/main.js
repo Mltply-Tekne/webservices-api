@@ -194,7 +194,7 @@ function addToTable(pPendingToReviewAgents) {
                 let buttonDelete = document.createElement('button')
                 buttonDelete.innerHTML = '<i class="fal fa-trash"></i>'
                 // buttonDelete.setAttribute('onclick', `editAgency(${pendingToReviewAgent['submissionId']}, 'delete')`)
-                buttonDelete.setAttribute('onclick', `confirmationPopup('Are you sure delete?', 'This will not be reversible.', 'updateAgentStatus([{submissionId: ${pendingToReviewAgent['submissionId']}, newStatus: -3}])')`)
+                buttonDelete.setAttribute('onclick', `confirmationPopup('Are you sure you want to delete this submission record?', '', 'updateAgentStatus([{submissionId: ${pendingToReviewAgent['submissionId']}, newStatus: -3}])')`)
                 td.append(buttonDelete)
 
             } else if (['agentGroupId', 'existingAgentId'].includes(key)) {
