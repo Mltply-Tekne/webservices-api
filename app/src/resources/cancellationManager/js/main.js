@@ -78,7 +78,6 @@ async function poblateTables() {
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 120px; width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
                 td.setAttribute('id', `td_${key}_${policy['invoicenumber']}`)
-                td.setAttribute('title', policy[key])
                 tr.append(td)
 
                 
@@ -109,40 +108,26 @@ async function poblateTables() {
                 td.setAttribute('style', 'max-width: 80px; width: 30px; white-space: nowrap; text-overflow: ellipsis; text-align: center;')
                 tr.append(td)
 
-                let button = document.createElement('button')
-                button.setAttribute('id', `checkbox_agency_${policy['invoicenumber']}`)
+                if (!['paid', 'deleted'].includes(policy.status)) {
 
-                button.innerHTML = policy.cancelstatus == 'scheduled' ? '<i class="fas fa-pause-circle"></i>' : '<i class="fas fa-clock"></i>'
-                button.setAttribute('onclick', `changeCancelStatus('${policy['invoicenumber']}', '${policy.cancelstatus == 'scheduled' ? 'scheduled' : 'paused'}')`)
-                button.setAttribute('title', policy.cancelstatus == 'scheduled' ? 'Pause' : 'Resume')
-                td.append(button)
-
-                let buttonDelete = document.createElement('button')
-                buttonDelete.innerHTML = '<i class="fas fa-trash-alt"></i>'
-                buttonDelete.setAttribute('onclick', `changeCancelStatus('${policy['invoicenumber']}', 'deleted')`)
-                buttonDelete.setAttribute('title', 'Delete')
-                td.append(buttonDelete)
-
-            } else if (key == 'cancelstatus') {
-                
-                let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 90px; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;')
-                tr.append(td)
-
-                detailedStatusDescriptions = {
-                    'scheduled': {
-                        name: 'Scheduled',
-                        icon: `<i style='color: #000dff; margin-right: 1%;' class="fas fa-clock"></i>`
-                    },
-                    'paused': {
-                        name: 'Paused',
-                        icon: `<i style='color: #E49B0F; margin-right: 1%;' class="fas fa-pause-circle"></i>`
-                    }
+                    let button = document.createElement('button')
+                    button.setAttribute('id', `checkbox_agency_${policy['invoicenumber']}`)
+    
+                    button.innerHTML = policy.cancelstatus == 'scheduled' ? '<i class="fal fa-pause-circle"></i>' : '<i class="fal fa-clock"></i>'
+                    // button.title = policy.cancelstatus == 'scheduled' ? 'Pause' : 'Resume'
+                    button.setAttribute("data-tooltip", policy.cancelstatus == 'scheduled' ? 'Pause' : 'Resume')
+                    button.setAttribute("class", "link")
+                    button.setAttribute('onclick', `changeCancelStatus('${policy['invoicenumber']}', '${policy.cancelstatus == 'scheduled' ? 'paused' : 'scheduled'}')`)
+                    td.append(button)
                 }
 
-                detailedStatus = detailedStatusDescriptions[policy[key]]
-                td.setAttribute('title', detailedStatus.name)
-                td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
+                let buttonDelete = document.createElement('button')
+                buttonDelete.innerHTML = '<i class="fal fa-trash"></i>'
+                // buttonDelete.title = 'Remove'
+                buttonDelete.setAttribute('onclick', `changeCancelStatus('${policy['invoicenumber']}', 'deleted')`)
+                buttonDelete.setAttribute("data-tooltip", "Delete")
+                buttonDelete.setAttribute("class", "link")
+                td.append(buttonDelete)
 
             } else if (key == 'status') {
 
@@ -153,16 +138,45 @@ async function poblateTables() {
                 detailedStatusDescriptions = {
                     'not_paid': {
                         name: 'Not Paid',
-                        icon: `<i style='color: #FE1616; margin-right: 1%;' class="fas fa-times"></i>`
+                        icon: `<i style='color: #800000; margin-right: 1%;' class="far fa-credit-card"></i>`
                     },
-                    'other': {
-                        name: 'Not Applicable',
-                        icon: `<i style='color: #E49B0F; margin-right: 1%;' class="fas fa-times"></i>`
+                    'paid': {
+                        name: 'Paid',
+                        icon: `<i style='color: #50C878; margin-right: 1%;' class="far fa-credit-card"></i>`
+                    },
+                    'deleted': {
+                        name: 'Deleted',
+                        icon: `<i style='color: #6A6A6A; margin-right: 1%;' class="fas fa-times-circle"></i>`
                     }
                 }
 
-                detailedStatus = policy[key] === 'not_paid' ? detailedStatusDescriptions.not_paid : detailedStatusDescriptions.other
-                td.setAttribute('title', detailedStatus.name)
+                detailedStatus = detailedStatusDescriptions[policy[key]]
+                console.log(policy[key])
+                td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
+
+            } else if (key == 'cancelstatus') {
+                
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 90px; width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;')
+                tr.append(td)
+
+                detailedStatusDescriptions = {
+                    'scheduled': {
+                        name: 'Scheduled',
+                        icon: `<i style='color: #0047AB; margin-right: 1%;' class="fas fa-clock"></i>`
+                    },
+                    'paused': {
+                        name: 'Paused',
+                        icon: `<i style='color: #E49B0F; margin-right: 1%;' class="fas fa-pause-circle"></i>`
+                    },
+                    'other': {
+                        name: 'Not Applicable',
+                        icon: `<i style='color: #6A6A6A; margin-right: 1%;' class="fas fa-times-circle"></i>`
+                    }
+                }
+
+                detailedStatus = (policy.status == 'paid') || (policy.status == 'deleted') ? detailedStatusDescriptions.other : detailedStatusDescriptions[policy[key]]
+
                 td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
 
             } else if (key == 'cancelreason') {
@@ -179,7 +193,6 @@ async function poblateTables() {
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
                 td.setAttribute('id', `td_${key}_${policy['invoicenumber']}`)
-                td.setAttribute('title', policy[key])
                 tr.append(td)
                 
                 td.innerHTML = policy[key]

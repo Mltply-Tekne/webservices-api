@@ -92,16 +92,19 @@ table.main-table td {
 
 table.main-table td > button {
   border: 0px solid gray;
-  background-color: rgba(0,0,0,0.0);
+  background-color: rgba(0,0,0,0);
+  color: rgb(50,50,50);
   border-radius: 10px;
   padding-left: 10px;
   padding-right: 10px;
-  transition: 0.5s;
+  transition: 0.3s;
 }
 
 table.main-table td > button:hover {
   color: var(--orange);
+  /* transform: scale(1.1); */
 }
+
 
 table td label {
   display: none;

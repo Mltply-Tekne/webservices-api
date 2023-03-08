@@ -1,4 +1,4 @@
-function editAgency (pSubmissionId) {
+function editAgency (pSubmissionId, pOptions) {
 
     let agentData = pendingToReviewAgents.find(agent => agent['submissionId'] == pSubmissionId)
 
@@ -6,7 +6,6 @@ function editAgency (pSubmissionId) {
     body.innerHTML = ""
     body.setAttribute("style", "text-align: center")
     document.getElementById('title_standard_popup').innerHTML = `<i style='margin-right: 1%;' class="fal fa-pencil"></i> Modify agency`
-
 
     for (field of Object.keys(selectedFieldsAndNames)) {
 
@@ -133,7 +132,7 @@ function editAgency (pSubmissionId) {
     buttonContainer.append(saveButton)
 
     var r = document.querySelector('.dropdown-menu');
-r.style.setProperty('--bs-dropdown-link-active-bg', '#FF7327');
+    r.style.setProperty('--bs-dropdown-link-active-bg', '#FF7327');
 
     saveButton.addEventListener('click', async function () {
 
@@ -212,7 +211,76 @@ r.style.setProperty('--bs-dropdown-link-active-bg', '#FF7327');
 
     })
 
+    openstandard_popup()
+
+}
+
+async function updateAgent() {
+
+    // usar filter (pasandole un array) en vez de find
+    originalAgencyData = pendingToReviewAgents.find(agent => agent['submissionId'] == newDataObj.submissionId)
+        
+    agencyData = apiData.parentAgencyData.find(agency => agency['name'] == newDataObj.parentAgencyName)
+
+    for (newData in newDataObj) {
+        originalAgencyData[newData] = newDataObj[newData]
+    }
+
+    originalAgencyData['parentAgencyRefCode'] = agencyData.refcode
+    originalAgencyData['parentAgencyId'] = agencyData.agentgroupid
+
+    originalAgencyData.updated = true
+    originalAgencyData.newStatus = stateToCheck
+
+
+    await postToServer('updateAgentsToManage', {reviewedAgents: [originalAgencyData]})
+    
+}
+
+async function confirmationPopup(pPrimaryText, pSecondaryText, pAction) {
+
+    let body = document.getElementById('standard_popup_body')
+    body.innerHTML = ""
+    body.setAttribute("style", "text-align: center")
+
+    let textContainer = document.createElement('div')
+    textContainer.setAttribute('style', 'display: flex; justify-content: center; flex-direction: column;')
+    body.append(textContainer)
+
+    let icon = document.createElement('p')
+    icon.innerHTML = `<i style='font-size: 40px; color: var(--orange);' class="fas fa-question-circle"></i>`
+    textContainer.append(icon)
+
+    let p = document.createElement('p')
+    p.setAttribute('style', 'text-align: center; font-size: 21px;')
+    p.innerHTML = pPrimaryText
+    textContainer.append(p)
+
+    let pSub = document.createElement('p')
+    pSub.setAttribute('style', 'text-align: center; font-size: 15px; width: 50%; color: rgb(80,80,80)')
+    pSub.innerHTML = pSecondaryText
+    textContainer.append(pSub)
+
+    let buttonContainer = document.createElement('div')
+    buttonContainer.setAttribute('style', 'display: flex; justify-content: end;')
+    body.append(buttonContainer)
+
+    var button = document.createElement('button')
+    button.classList.add('input_popup_warn')
+    button.setAttribute('onclick', 'closestandard_popup()')
+    button.innerHTML = "Cancel"
+    buttonContainer.append(button)
+
+    var confirmButton = document.createElement('button')
+    confirmButton.classList.add('input_popup_warn')
+    confirmButton.innerHTML = "Confirm"
+    confirmButton.setAttribute("onclick", `${pAction}`)
+    buttonContainer.append(confirmButton)
+
+    confirmButton.addEventListener('click', async function () {
+        closestandard_popup()
+    })
 
     openstandard_popup()
 
-  }
+}

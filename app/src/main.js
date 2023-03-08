@@ -31,8 +31,10 @@ require('./config/network.js')(app, express);
 app.use('/cancellations/', require('./routes/cancellationsRoutes'))
 app.use('/agency/verification/', require('./routes/agencyVerificationRoutes'))
 app.use('/resources/', require('./routes/resourcesRoutes'))
-require("./routes/auth.routes")(app);
-require("./routes/user.routes")(app);
+// require("./routes/auth.routes")(app);
+// require("./routes/user.routes")(app);
+// app.use('/auth/', require('./routes/auth.routes'))
+// app.use('/user/', require('./routes/user.routes'))
 
 
 app.get('/test/', function (request, response) {

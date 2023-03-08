@@ -23,23 +23,33 @@
         
 
         console.log(Object.fromEntries(data.entries()))
+        // console.log(Object.fromEntries(data.entries()).username)
         console.log(e)
 
-        // $.ajax({
-        //     url: 'https://mltply.eastus.cloudapp.azure.com/webservices/dev/api/auth/signup',
-        //     type: "POST",
-        //     dataType: 'html',
-        //     data: {
-        //         username: 'test',
-        //         password: 'passwd',
-        //         role: ''
-        //     },
-        //     success: function(response){
-        //         console.log(response)
-        //     }
-        // })
+        var baseUrl = serverEnvironment == 'production' ? `https://pouch.eastus.cloudapp.azure.com/api/v1/agent/` : `https://mltply.eastus.cloudapp.azure.com/webservices/${serverEnvironment}/auth/api/auth/signup`
 
-        console.log(check)
+        $.ajax({
+            url: baseUrl,
+            type: "POST",
+            dataType: 'html',
+            // data: {
+            //     username: Object.fromEntries(data.entries()).username,
+            //     email: Object.fromEntries(data.entries()).email,
+            //     password: Object.fromEntries(data.entries()).pass,
+            //     role: $('#role').val()
+            // },
+           data:  $("#signup-form").serializeArray(),
+            success: function(response){
+                console.log(response)
+                document.getElementById("text-message").innerHTML = response;
+                document.getElementById("text-message").style.display = "block"
+                document.getElementById("text-message").style.color = "darkgreen" 
+            },
+            error: function(xhr, status, error) {
+                console.log('Error:', xhr.responseText);
+                console.log('Error:', error);
+            }
+        })
 
         // return check;
     });

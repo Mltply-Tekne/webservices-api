@@ -1,4 +1,4 @@
-function changeCancelStatus(pInvoiceNumber, pCancelStatus) {
+function changeCancelStatus(pInvoiceNumber, pNewCancelStatus) {
     let policyIndex = policiesToBeCanceledOrPaused.findIndex(policy => policy['invoicenumber'] == pInvoiceNumber)
 
     let body = document.getElementById('standard_popup_body')
@@ -13,11 +13,15 @@ function changeCancelStatus(pInvoiceNumber, pCancelStatus) {
     icon.innerHTML = `<i style='font-size: 40px; color: var(--orange);' class="fas fa-question-circle"></i>`
     textContainer.append(icon)
 
-
     let p = document.createElement('p')
-    p.setAttribute('style', 'text-align: center; font-size: 20px;')
-    p.innerHTML = `<i style='margin-right: 1%;'></i> Are you sure to ${pCancelStatus == 'scheduled' ? 'pause' : pCancelStatus == 'paused' ? 'resume' : 'delete'} the policy automated cancellation?`
+    p.setAttribute('style', 'text-align: center; font-size: 21px;')
+    p.innerHTML = `<i style='margin-right: 1%;'></i> Are you sure to ${pNewCancelStatus == 'scheduled' ? 'resume' : pNewCancelStatus == 'paused' ? 'pause' : 'delete'} the policy automated cancellation?`
     textContainer.append(p)
+
+    let pSub = document.createElement('p')
+    pSub.setAttribute('style', 'text-align: center; font-size: 15px; width: 50%; color: rgb(80,80,80)')
+    pSub.innerHTML = `<i style='margin-right: 1%;'></i> The specified policy will ${pNewCancelStatus == 'scheduled' ? 'be cancelled on the next cancellation run.' : pNewCancelStatus == 'paused' ? 'remain paused until you have manually resume it, or the invoice is paid.' : 'not be cancelled.'}`
+    textContainer.append(pSub)
 
     let buttonContainer = document.createElement('div')
     buttonContainer.setAttribute('style', 'display: flex; justify-content: end;')
@@ -38,12 +42,12 @@ function changeCancelStatus(pInvoiceNumber, pCancelStatus) {
 
         closestandard_popup()
 
-        policiesToBeCanceledOrPaused[policyIndex].cancelstatus = pCancelStatus == 'scheduled' ? 'paused' : 
-                                                                pCancelStatus == 'paused' ? 'scheduled' : 'deleted'
+        policiesToBeCanceledOrPaused[policyIndex].cancelstatus = pNewCancelStatus == 'scheduled' ? 'scheduled' : 
+                                                                pNewCancelStatus == 'paused' ? 'paused' : 'deleted'
 
         await postToServer('cancellations', {reviewedCancellations: [policiesToBeCanceledOrPaused[policyIndex]]})
 
-        if (pCancelStatus == 'deleted') policiesToBeCanceledOrPaused.splice(policyIndex, 1)
+        if (pNewCancelStatus == 'deleted') policiesToBeCanceledOrPaused.splice(policyIndex, 1)
 
         poblateTables()
     })

@@ -39,8 +39,10 @@ selectedFieldsAndNames = stateToCheck < 2 ?
     'enabledStates': 'Enabled States', 
     'parentAgencyName': 'Parent Agency', 
     'parentAgencyCommission': 'Commission',
+    'existingAgentId': 'Agent Group Id',
     'edit': 'Edit',
-    'reviewStatus': 'checkbox'
+    'reviewStatus': 'checkbox',
+    'delete': 'Delete'
     
 } : {
 
@@ -51,11 +53,12 @@ selectedFieldsAndNames = stateToCheck < 2 ?
     'parentAgencyName': 'Parent Agency',
     'parentAgencyCommission': 'Commission',
     'agentGroupId': 'Agent Group Id',
+    'salesPerson': 'Sales People',
     'currentStatus': 'Status'
 
 }
 
-nonEditableFields = ['edit', 'reviewStatus']
+nonEditableFields = ['edit', 'reviewStatus', 'delete', 'existingAgentId']
 
 function addToTable(pPendingToReviewAgents) {
     // Iterating contents
@@ -86,6 +89,11 @@ function addToTable(pPendingToReviewAgents) {
                 input.setAttribute('name', 'approvalRequired')
                 input.setAttribute('submissionId', pendingToReviewAgent['submissionId'])
                 input.setAttribute('id', `checkbox_agency_${pendingToReviewAgent['submissionId']}`)
+
+                if (pendingToReviewAgent.alreadyExists == true) {
+                    input.setAttribute('disabled', '')
+                }
+
                 td.append(input)
 
                 input.addEventListener('change', function() {
@@ -116,7 +124,7 @@ function addToTable(pPendingToReviewAgents) {
                 
                 td.innerHTML = pendingToReviewAgent[key]
 
-            } else if (key == 'parentAgencyName' && !(stateToCheck < 2)) {
+            } else if (key == 'parentAgencyName') {
 
                 let td = document.createElement('td')
                 td.setAttribute('style', 'max-width: 300px; width: 300px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
@@ -140,10 +148,17 @@ function addToTable(pPendingToReviewAgents) {
                 button.innerHTML = '<i class="fal fa-pencil"></i>'
                 td.append(button)
 
-            } else if (key == 'currentStatus') {
+            } else if (key == 'salesPerson') {
+                let td = document.createElement('td')
+                td.setAttribute('style', 'max-width: 70px; width: 70px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis; text-align: center;')
+                tr.append(td)
+                
+                td.innerHTML = pendingToReviewAgent[key].length
+
+            }else if (key == 'currentStatus') {
 
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('style', 'max-width: 200px; width: 200px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
                 td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
                 tr.append(td)
 
@@ -170,10 +185,28 @@ function addToTable(pPendingToReviewAgents) {
                 
                 td.innerHTML = detailedStatus.icon + ' ' + detailedStatus.name
 
-            } else if (key == 'agentGroupId') {
+            } else if (key == 'delete') {
 
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                td.setAttribute('style', 'max-width: 120px; width: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;')
+                tr.append(td)
+
+                let buttonDelete = document.createElement('button')
+                buttonDelete.innerHTML = '<i class="fal fa-trash"></i>'
+                // buttonDelete.setAttribute('onclick', `editAgency(${pendingToReviewAgent['submissionId']}, 'delete')`)
+                buttonDelete.setAttribute('onclick', `confirmationPopup('Are you sure delete?', 'This will not be reversible.', 'updateAgentStatus([{submissionId: ${pendingToReviewAgent['submissionId']}, newStatus: -3}])')`)
+                td.append(buttonDelete)
+
+            } else if (['agentGroupId', 'existingAgentId'].includes(key)) {
+
+                let td = document.createElement('td')
+
+                if (key == 'agentGroupId') {
+                    td.setAttribute('style', 'max-width: 160px; width: 160px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                } else {
+                    td.setAttribute('style', 'max-width: 120px; width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                }
+                
                 td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
                 tr.append(td)
 
@@ -181,7 +214,7 @@ function addToTable(pPendingToReviewAgents) {
                 a.setAttribute('href', 'https://design.instanda.us/Agent/EditAgentGroup?agentGroupId=' + pendingToReviewAgent[key])
                 a.setAttribute('target', '_blank')
                 // a.setAttribute('style', 'color: var(--darkGray)')
-                a.innerHTML = pendingToReviewAgent[key]
+                a.innerHTML = pendingToReviewAgent[key] == undefined ? '' : pendingToReviewAgent[key]
 
                 td.append(a)
 
@@ -191,7 +224,11 @@ function addToTable(pPendingToReviewAgents) {
             } else {
 
                 let td = document.createElement('td')
-                td.setAttribute('style', 'max-width: 120px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+
+                if (stateToCheck < 2) {
+                    td.setAttribute('style', 'max-width: 70px; width: 70px; white-space: nowrap; overflow: hidden;  line-break: nowrap; text-overflow: ellipsis;')
+                }
+                
                 td.setAttribute('id', `td_${key}_${pendingToReviewAgent['submissionId']}`)
                 tr.append(td)
                 
@@ -203,6 +240,29 @@ function addToTable(pPendingToReviewAgents) {
         }
 
     }
+}
+
+async function updateChangedAgents(pArraySubmissionIds) {
+    arrayObjects = pendingToReviewAgents.filter(agent => pArraySubmissionIds.includes(agent.submissionId));
+    await postToServer('updateAgentsToManage', {reviewedAgents: arrayObjects})
+}
+
+async function updateAgentStatus(pArrayObjSubmissionIds) {
+
+    changedSubmission = []
+
+    for (submission of pArrayObjSubmissionIds) {
+        changedSubmission.push(submission.submissionId)
+        index = pendingToReviewAgents.findIndex(agent => agent.submissionId == submission.submissionId)
+        pendingToReviewAgents[index].newStatus = submission.newStatus
+
+        if (submission.newStatus == -3) {
+            td = document.querySelector(`[submissionId="${submission.submissionId}"]`)
+            td.remove()
+        }
+    }
+
+    updateChangedAgents(changedSubmission)
 }
 
 async function poblateTables() {
@@ -239,6 +299,12 @@ async function poblateTables() {
             th.setAttribute('style', 'text-align: center;')
             th.innerHTML = field
 
+        } else if (field == 'Sales People') {
+            th.setAttribute("data-tooltip", 'Number of Sales People')
+            th.setAttribute("class", "link")
+            th.setAttribute("style", "--top_box: -6px; text-align: center;")
+            th.innerHTML = '<i class="fad fa-users"></i>'
+
         } else {
 
             th.innerHTML = field
@@ -260,8 +326,6 @@ async function poblateTables() {
 
 
 }
-
-
 
 
 approvalButton.addEventListener('click', async function() {

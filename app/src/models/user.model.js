@@ -13,7 +13,7 @@ module.exports = (sequelize, Sequelize) => {
     freezeTableName: true
   });
 
-  User.sync()
+  User.sync({alter: true});
 
   return User;
 };

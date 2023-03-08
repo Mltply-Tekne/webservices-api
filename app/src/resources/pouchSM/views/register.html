@@ -21,6 +21,10 @@
 	<link rel="stylesheet" type="text/css" href="https://mltply.eastus.cloudapp.azure.com/webservices/{server-environment}/resources/login/css/main.css">
     <link rel="stylesheet" type="text/css" href="https://mltply.eastus.cloudapp.azure.com/webservices/{server-environment}/resources/common/css/mainStyle1.css">
 <!--===============================================================================================-->
+<script>
+	var serverEnvironment = '{server-environment}'
+</script>
+
 </head>
 <body>
 	
@@ -28,16 +32,27 @@
 		<div class="container-login100">
 			<div class="wrap-login100">
 
-				<form class="login100-form validate-form">
+				<form id="signup-form" class="login100-form validate-form">
 					<span class="login100-form-title">
 						Developer Only Register
 					</span>
 
-					<div class="wrap-input100 validate-input">
+					<h5 style="display: block; text-align: center; color: darkgreen;" id="text-message">message</h5>
+					<br>
+
+					<div class="wrap-input100 validate-input" data-validate = "Username is required">
 						<input class="input100" type="text" name="username" placeholder="Username">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
 							<i class="fas fa-user" aria-hidden="true"></i>
+						</span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Email is required">
+						<input class="input100" type="text" name="email" placeholder="Email">
+						<span class="focus-input100"></span>
+						<span class="symbol-input100">
+							<i class="fas fa-envelope" aria-hidden="true"></i>
 						</span>
 					</div>
 
@@ -49,22 +64,42 @@
 						</span>
 					</div>
 
-                    <div class="wrap-input100 validate-input" data-validate = "Password is required">
-                        <p>Role</p>
-						<select name="role" id="role" style="width: 100%;">
-                            <option value="1">Review</option>
-                            <option value="2">Verify</option>
-                            <option value="3">Both</option>
-                        </select>
+					<!-- <div class="wrap-input100 validate-input">
+						<p>Role</p>
+						<label><input type="checkbox" name="role[]" value="review">Review</label>
+						<br>
+						<label><input type="checkbox" name="role[]" value="verify">Verify</label>
+						<br>
+						<label><input type="checkbox" name="role[]" value="admin">Admin</label>
+					</div> -->
+					<br>
+					<div class="wrap-input100">
+						<p>Roles</p>
+						<br>
+						<div class="checkbox-container">
+							<input type="checkbox" class="checkbox-input" id="role-review" name="role[]" value="review">
+							<label class="checkbox-label" for="role-review">Review</label>
+						</div>
+						<div class="checkbox-container">
+							<input type="checkbox" class="checkbox-input" id="role-verify" name="role[]" value="verify">
+							<label class="checkbox-label" for="role-verify">Verify</label>
+						</div>
+						<div class="checkbox-container">
+							<input type="checkbox" class="checkbox-input" id="role-admin" name="role[]" value="admin">
+							<label class="checkbox-label" for="role-admin">Admin</label>
+						</div>
 					</div>
+								
+					
 
-                    
 					
 					<div class="container-login100-form-btn">
-						<button class="login100-form-btn">
+						<button type="submit" class="login100-form-btn">
 							Register
 						</button>
 					</div>
+
+					
 
 					<!-- <div class="text-center p-t-12">
 						<span class="txt1">
